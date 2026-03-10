@@ -1,33 +1,33 @@
 # CLAUDE.md
 
-## Repository Overview
+## リポジトリ概要
 
-This is the `okamura-cen/claude` repository. It is currently in its initial state.
+`okamura-cen/claude` リポジトリ。現在は初期状態です。
 
-## Development Workflow
+## 開発ワークフロー
 
-### Branching
+### ブランチ運用
 
-- Feature branches follow the pattern `claude/<description>`
-- Always push with `git push -u origin <branch-name>`
+- フィーチャーブランチは `claude/<説明>` のパターンで作成する
+- プッシュ時は必ず `git push -u origin <ブランチ名>` を使用する
 
-### Commits
+### コミット
 
-- Write clear, descriptive commit messages
-- Keep commits focused on a single logical change
+- 明確でわかりやすいコミットメッセージを書く
+- 1つのコミットには1つの論理的な変更のみを含める
 
-## Project Structure
+## プロジェクト構成
 
-_This section should be updated as the project grows._
+_プロジェクトの成長に合わせてこのセクションを更新すること。_
 
-## Build & Test Commands
+## ビルド・テストコマンド
 
-_Add build, test, and lint commands here as they are introduced._
+_ビルド、テスト、リントのコマンドが導入されたらここに追記すること。_
 
-## Code Conventions
+## コーディング規約
 
-_Document language-specific style guidelines, formatting rules, and patterns as the project evolves._
+_言語ごとのスタイルガイド、フォーマットルール、パターンをここに記載すること。_
 
-## Key Dependencies
+## 主要な依存ライブラリ
 
-_List major dependencies and their purposes here._
+_主要な依存ライブラリとその用途をここに記載すること。_
