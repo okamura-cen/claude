@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio OS — 制作会社総合管理ポータル</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --primary:        #2563EB;
+      --primary-hover:  #1D4ED8;
+      --primary-light:  #EFF6FF;
+      --primary-border: #BFDBFE;
+      --success:        #10B981;
+      --warning:        #F59E0B;
+      --danger:         #EF4444;
+      --bg:             #F1F5F9;
+      --surface:        #FFFFFF;
+      --surface2:       #F8FAFC;
+      --text:           #0F172A;
+      --text-sub:       #475569;
+      --text-muted:     #94A3B8;
+      --border:         #E2E8F0;
+      --border-strong:  #CBD5E1;
+    }
+
+    /* ===== Reset ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    button { font-family: inherit; cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== Base ===== */
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== Custom Scrollbar ===== */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform 0.25s ease;
+    }
+
+    /* Brand */
+    .brand {
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .brand-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      display: block;
+    }
+    .brand-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 1px;
+    }
+
+    /* Navigation */
+    .nav {
+      flex: 1;
+      padding: 10px 0;
+      overflow-y: auto;
+    }
+    .nav-section {
+      padding: 10px 16px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 13.5px;
+      font-weight: 500;
+      text-align: left;
+      transition: background 0.12s, color 0.12s;
+      border-radius: 0;
+    }
+    .nav-item:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .nav-icon {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FDE68A;
+      padding: 1px 6px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .user-avatar {
+      width: 32px; height: 32px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ===== Main ===== */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== Pages ===== */
+    .page {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+    .page.active {
+      display: flex;
+    }
+
+    /* Page Header */
+    .page-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px 16px;
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .page-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .page-sub strong { color: var(--text-sub); }
+
+    /* Page Content (scrollable) */
+    .page-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    /* ===== Stats Cards ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .stat-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+    .stat-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-unit {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-sub);
+    }
+
+    /* ===== Content Grid ===== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 308px;
+      gap: 18px;
+      align-items: start;
+    }
+    .content-left  { display: flex; flex-direction: column; gap: 18px; }
+    .content-right { display: flex; flex-direction: column; gap: 18px; }
+
+    /* ===== Cards ===== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .card-link {
+      font-size: 12px;
+      color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .card-link:hover { text-decoration: underline; }
+    .card-body { padding: 16px 20px; }
+
+    /* ===== Quick Actions ===== */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .qa-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+    .qa-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+    .qa-icon { font-size: 17px; flex-shrink: 0; }
+
+    /* ===== Project List ===== */
+    .project-list { display: flex; flex-direction: column; }
+    .project-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .project-item:last-child { border-bottom: none; }
+    .project-item:hover { background: var(--bg); }
+    .project-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .project-client { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ===== Status Badges ===== */
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-active   { background: #D1FAE5; color: #065F46; }
+    .badge-planning { background: #DBEAFE; color: #1E40AF; }
+    .badge-review   { background: #FEF3C7; color: #92400E; }
+    .badge-done     { background: #F1F5F9; color: #475569; }
+    .badge-hold     { background: #F8FAFC; color: #94A3B8; border: 1px solid var(--border); }
+
+    /* ===== Activity ===== */
+    .activity-list { display: flex; flex-direction: column; }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 7px; height: 7px;
+      background: var(--primary);
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-text {
+      font-size: 12.5px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .activity-type {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .activity-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ===== Roadmap ===== */
+    .roadmap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .roadmap-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .roadmap-item:last-child { border-bottom: none; }
+    .roadmap-ico { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+    .roadmap-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+    .roadmap-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .rb-done   { background: #D1FAE5; color: #065F46; }
+    .rb-phase1 { background: var(--primary-light); color: var(--primary); }
+    .rb-future { background: #FEF3C7; color: #92400E; }
+
+    /* ===== iframe Pages ===== */
+    .iframe-page {
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .iframe-page iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ===== Coming Soon ===== */
+    .coming-soon {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 40px;
+    }
+    .cs-emoji { font-size: 60px; margin-bottom: 20px; display: block; }
+    .cs-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .cs-desc  { font-size: 13.5px; color: var(--text-sub); margin-bottom: 22px; line-height: 1.7; max-width: 360px; }
+    .cs-badge {
+      font-size: 13px;
+      font-weight: 600;
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FDE68A;
+      padding: 6px 18px;
+      border-radius: 20px;
+    }
+
+    /* ===== Empty / Loading States ===== */
+    .empty-state {
+      padding: 24px 20px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* ===== Hamburger & Overlay ===== */
+    .hamburger {
+      display: none;
+      position: fixed;
+      bottom: 20px; right: 20px;
+      width: 48px; height: 48px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      z-index: 200;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 90;
+    }
+    .overlay.show { display: block; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1200px) {
+      .content-grid { grid-template-columns: 1fr 280px; }
+    }
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-220px); }
+      .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.12); }
+      .main { margin-left: 0; }
+      .hamburger { display: flex; }
+      .page-content { padding: 16px; }
+      .page-header { padding: 14px 16px 12px; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Overlay (mobile) -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ===== Sidebar ===== -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-inner">
+      <div class="brand-icon">⚙</div>
+      <div>
+        <span class="brand-name">Studio OS</span>
+        <span class="brand-sub">制作会社総合システム</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-section">メイン</div>
+
+    <button class="nav-item active" data-page="dashboard"
+            onclick="switchPage('dashboard', this)">
+      <span class="nav-icon">⊞</span>ダッシュボード
+    </button>
+
+    <button class="nav-item" data-page="clients"
+            onclick="switchPage('clients', this)">
+      <span class="nav-icon">👥</span>クライアント管理
+    </button>
+
+    <button class="nav-item" data-page="projects"
+            onclick="switchPage('projects', this)">
+      <span class="nav-icon">🖥</span>プロジェクト一覧
+    </button>
+
+    <button class="nav-item" data-page="links"
+            onclick="switchPage('links', this)">
+      <span class="nav-icon">🔖</span>リンク集
+    </button>
+
+    <div class="nav-section" style="margin-top:8px;">今後追加予定</div>
+
+    <button class="nav-item" data-page="tasks"
+            onclick="switchPage('tasks', this)">
+      <span class="nav-icon">✅</span>タスク管理
+      <span class="nav-badge">Phase 2</span>
+    </button>
+
+    <button class="nav-item" data-page="invoices"
+            onclick="switchPage('invoices', this)">
+      <span class="nav-icon">📄</span>請求書・見積書
+      <span class="nav-badge">Phase 3</span>
+    </button>
+
+    <button class="nav-item" data-page="files"
+            onclick="switchPage('files', this)">
+      <span class="nav-icon">📁</span>ファイル管理
+      <span class="nav-badge">Phase 4</span>
+    </button>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer">
+    <div class="user-avatar" id="user-avatar">—</div>
+    <div class="user-info">
+      <div class="user-name" id="user-name">未ログイン</div>
+      <div class="user-role" id="user-role">—</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Hamburger (mobile) -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="メニュー">☰</button>
+
+<!-- ===== Main Content ===== -->
+<main class="main">
+
+  <!-- ========== (A) Dashboard ========== -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-title">ダッシュボード</div>
+      <div class="page-sub" id="greeting-text">読み込み中...</div>
+    </div>
+    <div class="page-content">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">👥</span>
+          <div class="stat-label">クライアント数</div>
+          <div class="stat-value" id="stat-clients">—</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">⚡</span>
+          <div class="stat-label">進行中プロジェクト</div>
+          <div class="stat-value" id="stat-projects">—</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">💰</span>
+          <div class="stat-label">月次売上（サブスク）</div>
+          <div class="stat-value" id="stat-mrr">—</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">🔖</span>
+          <div class="stat-label">登録リンク数</div>
+          <div class="stat-value" id="stat-links">—</div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+
+        <!-- Left -->
+        <div class="content-left">
+
+          <!-- Quick Actions -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚡ クイックアクション</span>
+            </div>
+            <div class="card-body">
+              <div class="quick-actions">
+                <button class="qa-btn"
+                        onclick="switchPage('clients', document.querySelector('[data-page=clients]'))">
+                  <span class="qa-icon">👥</span>クライアント管理へ
+                </button>
+                <button class="qa-btn"
+                        onclick="switchPage('projects', document.querySelector('[data-page=projects]'))">
+                  <span class="qa-icon">🖥</span>プロジェクト一覧へ
+                </button>
+                <button class="qa-btn"
+                        onclick="switchPage('links', document.querySelector('[data-page=links]'))">
+                  <span class="qa-icon">🔖</span>リンク集を開く
+                </button>
+                <button class="qa-btn"
+                        onclick="switchPage('tasks', document.querySelector('[data-page=tasks]'))">
+                  <span class="qa-icon">✅</span>タスク管理（準備中）
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Projects -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚡ 進行中プロジェクト</span>
+              <button class="card-link"
+                      onclick="switchPage('projects', document.querySelector('[data-page=projects]'))">
+                すべて見る →
+              </button>
+            </div>
+            <div class="project-list" id="dash-projects">
+              <div class="empty-state">データを読み込み中...</div>
+            </div>
+          </div>
+
+        </div><!-- /content-left -->
+
+        <!-- Right -->
+        <div class="content-right">
+
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📋 最近のアクティビティ</span>
+            </div>
+            <div class="activity-list" id="dash-activity">
+              <div class="empty-state">データを読み込み中...</div>
+            </div>
+          </div>
+
+          <!-- Roadmap -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🗺 開発ロードマップ</span>
+            </div>
+            <div class="roadmap-list">
+              <div class="roadmap-item">
+                <span class="roadmap-ico">✅</span>
+                <span class="roadmap-name">クライアント管理</span>
+                <span class="roadmap-badge rb-done">完了</span>
+              </div>
+              <div class="roadmap-item">
+                <span class="roadmap-ico">✅</span>
+                <span class="roadmap-name">リンク集</span>
+                <span class="roadmap-badge rb-done">完了</span>
+              </div>
+              <div class="roadmap-item">
+                <span class="roadmap-ico">🔵</span>
+                <span class="roadmap-name">統合ポータル</span>
+                <span class="roadmap-badge rb-phase1">Phase 1</span>
+              </div>
+              <div class="roadmap-item">
+                <span class="roadmap-ico">⏳</span>
+                <span class="roadmap-name">タスク管理</span>
+                <span class="roadmap-badge rb-future">Phase 2</span>
+              </div>
+              <div class="roadmap-item">
+                <span class="roadmap-ico">⏳</span>
+                <span class="roadmap-name">請求書・見積書</span>
+                <span class="roadmap-badge rb-future">Phase 3</span>
+              </div>
+              <div class="roadmap-item">
+                <span class="roadmap-ico">⏳</span>
+                <span class="roadmap-name">ファイル管理</span>
+                <span class="roadmap-badge rb-future">Phase 4</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /content-right -->
+      </div><!-- /content-grid -->
+    </div><!-- /page-content -->
+  </div><!-- /page-dashboard -->
+
+  <!-- ========== (B) Clients ========== -->
+  <div class="page" id="page-clients">
+    <div class="page-header">
+      <div class="page-title">クライアント管理</div>
+      <div class="page-sub">クライアントの登録・編集・管理</div>
+    </div>
+    <div class="iframe-page">
+      <iframe id="iframe-clients" src="client-manager.html"></iframe>
+    </div>
+  </div>
+
+  <!-- ========== (C) Projects ========== -->
+  <div class="page" id="page-projects">
+    <div class="page-header">
+      <div class="page-title">プロジェクト一覧</div>
+      <div class="page-sub">全クライアントのプロジェクトを管理</div>
+    </div>
+    <div class="iframe-page">
+      <iframe id="iframe-projects" src="client-manager.html"></iframe>
+    </div>
+  </div>
+
+  <!-- ========== (D) Links ========== -->
+  <div class="page" id="page-links">
+    <div class="page-header">
+      <div class="page-title">リンク集</div>
+      <div class="page-sub">業務で使用するリンクを管理</div>
+    </div>
+    <div class="iframe-page">
+      <iframe id="iframe-links" src="bookmarks-business.html"></iframe>
+    </div>
+  </div>
+
+  <!-- ========== (E) Tasks — Coming Soon ========== -->
+  <div class="page" id="page-tasks">
+    <div class="page-header">
+      <div class="page-title">タスク管理</div>
+      <div class="page-sub">タスクの作成・担当者アサイン・進捗管理</div>
+    </div>
+    <div class="coming-soon">
+      <span class="cs-emoji">✅</span>
+      <div class="cs-title">タスク管理</div>
+      <div class="cs-desc">
+        タスクの作成・担当者アサイン・進捗管理ができる機能を開発中です。<br>
+        チームの作業効率を大幅に向上させます。
+      </div>
+      <span class="cs-badge">Phase 2 — 開発予定</span>
+    </div>
+  </div>
+
+  <!-- ========== (E) Invoices — Coming Soon ========== -->
+  <div class="page" id="page-invoices">
+    <div class="page-header">
+      <div class="page-title">請求書・見積書</div>
+      <div class="page-sub">請求書・見積書の作成・PDF出力・送付管理</div>
+    </div>
+    <div class="coming-soon">
+      <span class="cs-emoji">📄</span>
+      <div class="cs-title">請求書・見積書</div>
+      <div class="cs-desc">
+        請求書・見積書の作成からPDF出力・送付履歴管理まで、<br>
+        請求業務をまるごとデジタル化します。
+      </div>
+      <span class="cs-badge">Phase 3 — 開発予定</span>
+    </div>
+  </div>
+
+  <!-- ========== (E) Files — Coming Soon ========== -->
+  <div class="page" id="page-files">
+    <div class="page-header">
+      <div class="page-title">ファイル管理</div>
+      <div class="page-sub">クライアント別のファイル保存・バージョン管理・共有</div>
+    </div>
+    <div class="coming-soon">
+      <span class="cs-emoji">📁</span>
+      <div class="cs-title">ファイル管理</div>
+      <div class="cs-desc">
+        クライアント別のファイル保存・バージョン管理・<br>
+        共有リンク生成ができる機能を開発中です。
+      </div>
+      <span class="cs-badge">Phase 4 — 開発予定</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- Hidden data iframe (dashboard data source) -->
+<iframe id="iframe-data" src="client-manager.html"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:none;top:-9999px;left:-9999px;"
+        onload="onDataFrameLoad()"></iframe>
+
+<script>
+'use strict';
+
+// ===== Utilities =====
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return String(dateStr);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  } catch (e) { return String(dateStr); }
+}
+
+function fmtYen(amount) {
+  const n = Number(amount) || 0;
+  return '¥' + n.toLocaleString('ja-JP');
+}
+
+// ===== Greeting =====
+function updateGreeting() {
+  const h   = new Date().getHours();
+  const now = new Date();
+  const days = ['日','月','火','水','木','金','土'];
+  const dateStr = `${now.getMonth() + 1}月${now.getDate()}日（${days[now.getDay()]}）`;
+  let greet = '';
+  if (h < 12)      greet = 'おはようございます';
+  else if (h < 18) greet = 'こんにちは';
+  else              greet = 'お疲れさまです';
+
+  const el = document.getElementById('greeting-text');
+  if (el) el.innerHTML = `<strong>${greet}</strong>&ensp;${dateStr}`;
+}
+
+// ===== Mobile Sidebar =====
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ===== Page Switching =====
+function switchPage(pageId, btnElement) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  // Show target
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+
+  // Projects: switch to projects view inside iframe
+  if (pageId === 'projects') {
+    const iframe = document.getElementById('iframe-projects');
+    if (iframe) {
+      const tryShow = () => {
+        try {
+          if (iframe.contentWindow && iframe.contentWindow.showView) {
+            iframe.contentWindow.showView('projects');
+          }
+        } catch (e) { /* cross-origin fallback — iframe will show default view */ }
+      };
+      // Try immediately; if not ready, wait for load
+      try {
+        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+          tryShow();
+        } else {
+          iframe.addEventListener('load', tryShow, { once: true });
+        }
+      } catch (e) { /* cross-origin */ }
+    }
+  }
+
+  // Dashboard: refresh data
+  if (pageId === 'dashboard') {
+    refreshDashboard();
+  }
+
+  // Close mobile sidebar
+  closeSidebar();
+}
+
+// ===== Status Badge HTML =====
+function statusBadge(status) {
+  const map = {
+    active:   ['badge-active',   '進行中'],
+    planning: ['badge-planning', '計画中'],
+    review:   ['badge-review',   'レビュー中'],
+    done:     ['badge-done',     '完了'],
+    hold:     ['badge-hold',     '保留'],
+  };
+  const [cls, label] = map[status] || ['badge-hold', esc(status) || '—'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+// ===== Dashboard: links count from localStorage =====
+function loadLinksCount() {
+  try {
+    const raw = localStorage.getItem('bm_biz_v1');
+    if (!raw) { document.getElementById('stat-links').textContent = '0'; return; }
+    const data = JSON.parse(raw);
+    let count = 0;
+    if (Array.isArray(data)) {
+      count = data.length;
+    } else if (data && typeof data === 'object') {
+      if (Array.isArray(data.bookmarks)) count = data.bookmarks.length;
+      else if (Array.isArray(data.links))  count = data.links.length;
+      else count = Object.keys(data).length;
+    }
+    document.getElementById('stat-links').textContent = count;
+  } catch (e) {
+    document.getElementById('stat-links').textContent = '—';
+  }
+}
+
+// ===== Dashboard: update from client data =====
+function updateDashboard(clients) {
+  if (!Array.isArray(clients)) return;
+
+  // Client count
+  document.getElementById('stat-clients').textContent = clients.length;
+
+  // Aggregate projects & history
+  const activeProjs = [];
+  let mrrTotal = 0;
+  const allHistory = [];
+
+  clients.forEach(client => {
+    const clientName = esc(client.name || client.companyName || '—');
+    const projs = Array.isArray(client.projects) ? client.projects : [];
+
+    projs.forEach(proj => {
+      if (proj.status === 'active') {
+        activeProjs.push({ ...proj, _clientName: clientName });
+      }
+      if (proj.contractType === 'subscription' && proj.amount) {
+        mrrTotal += parseFloat(proj.amount) || 0;
+      }
+    });
+
+    const hist = Array.isArray(client.history) ? client.history : [];
+    hist.forEach(h => allHistory.push(h));
+  });
+
+  // Active projects count
+  document.getElementById('stat-projects').textContent = activeProjs.length;
+
+  // MRR
+  document.getElementById('stat-mrr').innerHTML =
+    `${fmtYen(mrrTotal)}<span class="stat-unit">/月</span>`;
+
+  // Projects list (top 6)
+  const projList = document.getElementById('dash-projects');
+  if (activeProjs.length === 0) {
+    projList.innerHTML = '<div class="empty-state">進行中のプロジェクトはありません</div>';
+  } else {
+    projList.innerHTML = activeProjs.slice(0, 6).map(p => `
+      <div class="project-item">
+        <div>
+          <div class="project-name">${esc(p.name || '無名プロジェクト')}</div>
+          <div class="project-client">${p._clientName}</div>
+        </div>
+        ${statusBadge(p.status)}
+      </div>
+    `).join('');
+  }
+
+  // Activity (newest 6)
+  const actList = document.getElementById('dash-activity');
+  allHistory.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  const top6act = allHistory.slice(0, 6);
+  if (top6act.length === 0) {
+    actList.innerHTML = '<div class="empty-state">アクティビティがありません</div>';
+  } else {
+    actList.innerHTML = top6act.map(h => `
+      <div class="activity-item">
+        <div class="activity-dot"></div>
+        <div class="activity-body">
+          <div class="activity-text">${esc(h.title || h.type || '—')}</div>
+          ${h.type ? `<div class="activity-type">${esc(h.type)}</div>` : ''}
+        </div>
+        <div class="activity-date">${fmtDate(h.date)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// Fallback when iframe data is unavailable
+function showDashboardFallback() {
+  document.getElementById('stat-clients').textContent  = '—';
+  document.getElementById('stat-projects').textContent = '—';
+  document.getElementById('stat-mrr').textContent      = '—';
+  document.getElementById('dash-projects').innerHTML   =
+    '<div class="empty-state">クライアント管理ページへアクセスするとデータが表示されます</div>';
+  document.getElementById('dash-activity').innerHTML   =
+    '<div class="empty-state">データがありません</div>';
+}
+
+// ===== Hidden data iframe load callback =====
+function onDataFrameLoad() {
+  const iframe = document.getElementById('iframe-data');
+  try {
+    const iw = iframe.contentWindow;
+
+    // User info from currentUser
+    let user = null;
+    if (typeof iw.currentUser === 'function') {
+      user = iw.currentUser();
+    } else if (iw.currentUser && typeof iw.currentUser === 'object') {
+      user = iw.currentUser;
+    }
+    if (user) {
+      const name = user.name || user.username || user.displayName || '';
+      const role = user.role || user.permission || user.level || '';
+      if (name) {
+        document.getElementById('user-name').textContent = name;
+        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+      }
+      if (role) document.getElementById('user-role').textContent = role;
+    }
+
+    // Client data
+    const data = typeof iw.load === 'function' ? iw.load() : null;
+    if (Array.isArray(data)) {
+      updateDashboard(data);
+    } else {
+      showDashboardFallback();
+    }
+  } catch (e) {
+    // Cross-origin or auth wall — show fallback silently
+    showDashboardFallback();
+  }
+}
+
+// ===== Refresh dashboard (called when switching to dashboard tab) =====
+function refreshDashboard() {
+  loadLinksCount();
+  // Try to read fresh data from already-loaded data iframe
+  try {
+    const iw = document.getElementById('iframe-data').contentWindow;
+    const data = typeof iw.load === 'function' ? iw.load() : null;
+    if (Array.isArray(data)) {
+      updateDashboard(data);
+    }
+  } catch (e) { /* cross-origin — ignore */ }
+}
+
+// ===== Projects iframe: call showView once it's ready =====
+(function initProjectsIframe() {
+  const iframe = document.getElementById('iframe-projects');
+  if (!iframe) return;
+  iframe.addEventListener('load', function () {
+    if (document.getElementById('page-projects').classList.contains('active')) {
+      try { this.contentWindow.showView('projects'); } catch (e) {}
+    }
+  });
+})();
+
+// ===== Boot =====
+updateGreeting();
+loadLinksCount();
+</script>
+</body>
+</html>

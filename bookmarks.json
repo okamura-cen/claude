@@ -1,0 +1,98 @@
+{
+  "groups": [
+    {
+      "id": "g1",
+      "name": "よく使う"
+    },
+    {
+      "id": "g2",
+      "name": "ニュース"
+    },
+    {
+      "id": "g3",
+      "name": "ゲーム"
+    },
+    {
+      "id": "_mmdk9vabym1rp",
+      "name": "マンガ"
+    },
+    {
+      "id": "_mmdka1fznyqap",
+      "name": "趣味"
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": "b2",
+      "name": "YouTube",
+      "url": "https://www.youtube.com",
+      "groupId": "g1"
+    },
+    {
+      "id": "_mmdjqayutv58x",
+      "name": "Twitch",
+      "url": "https://go.twitch.tv/",
+      "groupId": "g1"
+    },
+    {
+      "id": "_mmdk6t39xx8wx",
+      "name": "ABEMA",
+      "url": "https://abema.tv/",
+      "groupId": "g1"
+    },
+    {
+      "id": "_mmdk7tawp68oz",
+      "name": "Prime Video",
+      "url": "https://www.amazon.co.jp/gp/video/storefront",
+      "groupId": "g1"
+    },
+    {
+      "id": "_mmdkbok5m7dee",
+      "name": "Yahoo!ニュース",
+      "url": "https://news.yahoo.co.jp/",
+      "groupId": "g2"
+    },
+    {
+      "id": "_mmdkc667ych6m",
+      "name": "Google ニュース",
+      "url": "https://news.google.com/home?hl=ja&gl=JP&ceid=JP%3Aja",
+      "groupId": "g2"
+    },
+    {
+      "id": "_mmdkd0u2i70io",
+      "name": "朝日新聞：朝日新聞社のニュースサイト",
+      "url": "https://www.asahi.com/?iref=pc_gnavi",
+      "groupId": "g2"
+    },
+    {
+      "id": "_mmdkdsy3dz1yj",
+      "name": "ニュース速報 : 独自取材網による最新記事一覧",
+      "url": "https://www.yomiuri.co.jp/news/",
+      "groupId": "g2"
+    },
+    {
+      "id": "_mmdkesldd3w5i",
+      "name": "FANZA",
+      "url": "http://www.dmm.co.jp/top/",
+      "groupId": "_mmdka1fznyqap"
+    },
+    {
+      "id": "_mmdkf4hab1abp",
+      "name": "MissAV",
+      "url": "https://missav.ai/dm221/ja",
+      "groupId": "_mmdka1fznyqap"
+    },
+    {
+      "id": "_mmdkfh9onvobp",
+      "name": "NyaHentai",
+      "url": "https://nyahentai.re/",
+      "groupId": "_mmdka1fznyqap"
+    },
+    {
+      "id": "_mmdkfwjxbmdmw",
+      "name": "エロモモ",
+      "url": "https://momoniji.com/",
+      "groupId": "_mmdka1fznyqap"
+    }
+  ]
+}
